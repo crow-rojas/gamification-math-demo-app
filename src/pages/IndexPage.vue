@@ -1,47 +1,26 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+    <div>
+      <p>
+        This is an inline formula:
+        <KaTeXRenderer :formula="'c = \\pm\\sqrt{a^2 + b^2}'" inline />
+      </p>
+      <p>
+        And this is a block formula:
+        <KaTeXRenderer :formula="'c = \\pm\\sqrt{a^2 + b^2}'" />
+      </p>
+    </div>
+    <div>
+      <KaTeXEditor />
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import KaTeXRenderer from 'components/KaTeXRenderer.vue';
+import KaTeXEditor from 'components/KaTeXEditor.vue';
 
 defineOptions({
-  name: 'IndexPage'
-});
-
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
-
-const meta = ref<Meta>({
-  totalCount: 1200
+  name: 'IndexPage',
 });
 </script>
