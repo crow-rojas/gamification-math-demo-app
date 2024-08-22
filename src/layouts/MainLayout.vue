@@ -12,10 +12,31 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Gamification Math App
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <div class="row items-center q-gutter-sm">
+          <q-avatar color="primary" text-color="white">{{ currentUserInitial }}</q-avatar>
+          <q-badge color="primary" text-color="white">
+            <q-icon name="monetization_on" /> {{ state.currentUser.coins }}
+          </q-badge>
+          <q-btn-dropdown color="primary" label="Switch">
+            <q-list>
+              <q-item clickable v-for="user in state.users" :key="user.name" v-close-popup @click="switchUser(user)">
+                <q-item-section>
+                  <q-item-label>{{ user.name }}</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="switchUser(admin)">
+                <q-item-section>
+                  <q-item-label>Admin</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -25,10 +46,8 @@
       bordered
     >
       <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
+        <q-item-label header>
+          Pages
         </q-item-label>
 
         <EssentialLink
@@ -46,8 +65,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, provide, onMounted } from 'vue';
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+import { state, User } from '../store';
 
 defineOptions({
   name: 'MainLayout'
@@ -55,52 +75,51 @@ defineOptions({
 
 const linksList: EssentialLinkProps[] = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
+    title: 'Student Page',
+    caption: 'View exercises',
     icon: 'school',
-    link: 'https://quasar.dev'
+    link: '/student'
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    title: 'Admin Page',
+    caption: 'Create new exercises',
+    icon: 'edit',
+    link: '/admin'
   }
 ];
 
 const leftDrawerOpen = ref(false);
 
-function toggleLeftDrawer () {
+const currentUserInitial = computed(() => state.currentUser.name.charAt(0));
+
+function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
+
+const admin: User = { name: 'Admin', role: 'admin', coins: 0 };
+
+function switchUser(user: User) {
+  state.currentUser = user;
+  localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
+}
+
+// Provide the state to all children
+provide('state', state);
+
+onMounted(() => {
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    Object.assign(state.currentUser, JSON.parse(storedUser));
+  }
+
+  const storedExercises = localStorage.getItem('exercises');
+  if (storedExercises) {
+    state.exercises = JSON.parse(storedExercises);
+  }
+
+  const storedUnlockedExercises = localStorage.getItem('unlockedExercises');
+  if (storedUnlockedExercises) {
+    state.unlockedExercises = JSON.parse(storedUnlockedExercises);
+  }
+});
 </script>
